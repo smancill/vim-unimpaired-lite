@@ -45,23 +45,4 @@ is "args" and for the "q" commands is "quickfix".
 ]n                      Go to the next SCM conflict marker or diff/patch hunk.
                         Try d]n inside a conflict.
 
-OPTION TOGGLING                                 *unimpaired-toggling*
-
-On	Off	Option
-*[od*	*]od*	'diff' (actually |:diffthis| / |:diffoff|)
-*[ol*	*]ol*	'list'
-*[on*	*]on*	'number'
-*[or*	*]or*	'relativenumber'
-*[os*	*]os*	'spell'
-*[ov*	*]ov*	'virtualedit'
-*[ow*	*]ow*	'wrap'
-
-PASTING                                         *unimpaired-pasting*
-
-                                                *[op* *]op*
-A toggle has not been provided for 'paste' because the typical use case of
-wrapping of a solitary insertion is inefficient:  You toggle twice, but
-you only paste once (YOPO).  Instead, press [op or ]op to invoke |o| or |O|
-with 'paste' already set.  Leaving insert mode sets 'nopaste' automatically.
-
  vim:tw=78:et:ft=help:norl:

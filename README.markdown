@@ -8,17 +8,10 @@ commonly used ex commands. `]q` is :cnext. `[q` is :cprevious. `]a` is
 :next.  `[b` is :bprevious.  See the documentation for the full set of
 20 mappings and mnemonics.  All of them take a count.
 
-There are mappings for toggling options. `[os` and `]os` perform `:set spell`
-and `:set nospell`, respectively. There's also `l` (`list`), `n` (`number`),
-`w` (`wrap`), plus mappings to help alleviate the `set paste` dance.
-Consult the documentation.
-
 And in the miscellaneous category, there's `[n` and `]n` to jump between
 SCM conflict markers.
 
-The `.` command works with all operator mappings, and will work with the
-linewise mappings as well if you install
-[repeat.vim](https://github.com/tpope/vim-repeat).
+The `.` command works with all operator mappings.
 
 ## Installation
 

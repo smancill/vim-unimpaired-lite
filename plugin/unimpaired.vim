@@ -1,27 +1,20 @@
 " unimpaired.vim - Pairs of handy bracket mappings (slim version)
 " Maintainer:   Sebastián Mancilla
 " Author:       Tim Pope <http://tpo.pe/>
-" Version:      2.0
+" Version:      2.1
 
 if exists("g:loaded_unimpaired") || &cp || v:version < 700
   finish
 endif
 let g:loaded_unimpaired = 1
 
-let s:maps = []
-function! s:map(...) abort
-  call add(s:maps, copy(a:000))
-endfunction
-
-function! s:maps() abort
-  for [mode, head, rhs; rest] in s:maps
-    let flags = get(rest, 0, '') . (rhs =~# '^<Plug>' ? '' : '<script>')
-    let tail = ''
-    let keys = get(g:, mode.'remap', {})
-    if type(keys) != type({})
-      continue
-    endif
-    while !empty(head)
+function! s:Map(...) abort
+  let [mode, head, rhs; rest] = a:000
+  let flags = get(rest, 0, '') . (rhs =~# '^<Plug>' ? '' : '<script>')
+  let tail = ''
+  let keys = get(g:, mode.'remap', {})
+  if type(keys) == type({}) && !empty(keys)
+    while !empty(head) && len(keys)
       if has_key(keys, head)
         let head = keys[head]
         if empty(head)
@@ -32,58 +25,56 @@ function! s:maps() abort
       let tail = matchstr(head, '<[^<>]*>$\|.$') . tail
       let head = substitute(head, '<[^<>]*>$\|.$', '', '')
     endwhile
-    if head !=# '<skip>' && (flags !~? '<unique>' || empty(maparg(head.tail, mode)))
-      exe mode.'map' flags head.tail rhs
-    endif
-  endfor
+  endif
+  if head !=# '<skip>' && empty(maparg(head.tail, mode))
+    return mode.'map ' . flags . ' ' . head.tail . ' ' . rhs
+  endif
+  return ''
 endfunction
 
 " Section: Next and previous
 
-function! s:MapNextFamily(map,cmd) abort
+function! s:MapNextFamily(map, cmd, current) abort
+  let prefix = '<Plug>(unimpaired-' . a:cmd
   let map = '<Plug>unimpaired'.toupper(a:map)
   let cmd = '".(v:count ? v:count : "")."'.a:cmd
-  let end = '"<CR>'.(a:cmd ==# 'l' || a:cmd ==# 'c' ? 'zv' : '')
+  let zv = (a:cmd ==# 'l' || a:cmd ==# 'c' ? 'zv' : '')
+  let end = '"<CR>'.zv
+  execute 'nnoremap <silent> '.prefix.'previous) :<C-U>exe "'.cmd.'previous'.end
+  execute 'nnoremap <silent> '.prefix.'next)     :<C-U>exe "'.cmd.'next'.end
+  execute 'nnoremap '.prefix.'first)    :<C-U><C-R>=v:count ? v:count . "' . a:current . '" : "' . a:cmd . 'first"<CR><CR>' . zv
+  execute 'nnoremap '.prefix.'last)     :<C-U><C-R>=v:count ? v:count . "' . a:current . '" : "' . a:cmd . 'last"<CR><CR>' . zv
   execute 'nnoremap <silent> '.map.'Previous :<C-U>exe "'.cmd.'previous'.end
   execute 'nnoremap <silent> '.map.'Next     :<C-U>exe "'.cmd.'next'.end
   execute 'nnoremap <silent> '.map.'First    :<C-U>exe "'.cmd.'first'.end
   execute 'nnoremap <silent> '.map.'Last     :<C-U>exe "'.cmd.'last'.end
-  call s:map('n', '['.        a:map , map.'Previous')
-  call s:map('n', ']'.        a:map , map.'Next')
-  call s:map('n', '['.toupper(a:map), map.'First')
-  call s:map('n', ']'.toupper(a:map), map.'Last')
+  exe s:Map('n', '['.        a:map , prefix.'previous)')
+  exe s:Map('n', ']'.        a:map , prefix.'next)')
+  exe s:Map('n', '['.toupper(a:map), prefix.'first)')
+  exe s:Map('n', ']'.toupper(a:map), prefix.'last)')
 endfunction
 
-call s:MapNextFamily('a','')
-call s:MapNextFamily('b','b')
-call s:MapNextFamily('l','l')
-call s:MapNextFamily('q','c')
-call s:MapNextFamily('t','t')
-
-function! s:entries(path) abort
-  let path = substitute(a:path,'[\\/]$','','')
-  let files = split(glob(path."/.*"),"\n")
-  let files += split(glob(path."/*"),"\n")
-  call map(files,'substitute(v:val,"[\\/]$","","")')
-  call filter(files,'v:val !~# "[\\\\/]\\.\\.\\=$"')
-
-  let filter_suffixes = substitute(escape(&suffixes, '~.*$^'), ',', '$\\|', 'g') .'$'
-  call filter(files, 'v:val !~# filter_suffixes')
-
-  return files
-endfunction
+call s:MapNextFamily('a', '' , 'argument')
+call s:MapNextFamily('b', 'b', 'buffer')
+call s:MapNextFamily('l', 'l', 'll')
+call s:MapNextFamily('q', 'c', 'cc')
+call s:MapNextFamily('t', 't', 'trewind')
 
 " Section: Diff
 
-call s:map('n', '[n', '<Plug>unimpairedContextPrevious')
-call s:map('n', ']n', '<Plug>unimpairedContextNext')
-call s:map('o', '[n', '<Plug>unimpairedContextPrevious')
-call s:map('o', ']n', '<Plug>unimpairedContextNext')
+nnoremap <silent> <Plug>(unimpaired-context-previous) :<C-U>call <SID>Context(1)<CR>
+nnoremap <silent> <Plug>(unimpaired-context-next)     :<C-U>call <SID>Context(0)<CR>
+vnoremap <silent> <Plug>(unimpaired-context-previous) :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
+vnoremap <silent> <Plug>(unimpaired-context-next)     :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+onoremap <silent> <Plug>(unimpaired-context-previous) :<C-U>call <SID>ContextMotion(1)<CR>
+onoremap <silent> <Plug>(unimpaired-context-next)     :<C-U>call <SID>ContextMotion(0)<CR>
 
-nnoremap <silent> <Plug>unimpairedContextPrevious :call <SID>Context(1)<CR>
-nnoremap <silent> <Plug>unimpairedContextNext     :call <SID>Context(0)<CR>
-onoremap <silent> <Plug>unimpairedContextPrevious :call <SID>ContextMotion(1)<CR>
-onoremap <silent> <Plug>unimpairedContextNext     :call <SID>ContextMotion(0)<CR>
+exe s:Map('n', '[n', '<Plug>(unimpaired-context-previous)')
+exe s:Map('n', ']n', '<Plug>(unimpaired-context-next)')
+exe s:Map('x', '[n', '<Plug>(unimpaired-context-previous)')
+exe s:Map('x', ']n', '<Plug>(unimpaired-context-next)')
+exe s:Map('o', '[n', '<Plug>(unimpaired-context-previous)')
+exe s:Map('o', ']n', '<Plug>(unimpaired-context-next)')
 
 function! s:Context(reverse) abort
   call search('^\(@@ .* @@\|[<=>|]\{7}[<=>|]\@!\)', a:reverse ? 'bW' : 'W')
@@ -118,47 +109,5 @@ function! s:ContextMotion(reverse) abort
     normal! V
   endif
 endfunction
-
-" Section: Option toggling
-
-function! s:option_map(letter, option, mode) abort
-  call s:map('n', '[o'.a:letter, ':'.a:mode.' '.a:option.'<CR>')
-  call s:map('n', ']o'.a:letter, ':'.a:mode.' no'.a:option.'<CR>')
-endfunction
-
-call s:map('n', '[od', ':diffthis<CR>')
-call s:map('n', ']od', ':diffoff<CR>')
-call s:option_map('l', 'list', 'setlocal')
-call s:option_map('n', 'number', 'setlocal')
-call s:option_map('r', 'relativenumber', 'setlocal')
-call s:option_map('s', 'spell', 'setlocal')
-call s:option_map('w', 'wrap', 'setlocal')
-call s:map('n', '[ov', ':set virtualedit+=all<CR>')
-call s:map('n', ']ov', ':set virtualedit-=all<CR>')
-
-function! s:setup_paste() abort
-  let s:paste = &paste
-  let s:mouse = &mouse
-  set paste
-  set mouse=
-  augroup unimpaired_paste
-    autocmd!
-    autocmd InsertLeave *
-          \ if exists('s:paste') |
-          \   let &paste = s:paste |
-          \   let &mouse = s:mouse |
-          \   unlet s:paste |
-          \   unlet s:mouse |
-          \ endif |
-          \ autocmd! unimpaired_paste
-  augroup END
-endfunction
-
-call s:map('n', '[op', ':call <SID>setup_paste()<CR>O', '<silent>')
-call s:map('n', ']op', ':call <SID>setup_paste()<CR>o', '<silent>')
-
-" Section: Activation
-
-call s:maps()
 
 " vim:set sw=2 sts=2:
