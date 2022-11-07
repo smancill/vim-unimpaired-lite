@@ -1,4 +1,4 @@
-# unimpaired.vim (slim version)
+# unimpaired.vim (lite version)
 
 A fork of [unimpaired.vim](https://github.com/tpope/vim-unimpaired)
 with a minimum set of mappings.
@@ -20,7 +20,7 @@ support:
 
     mkdir -p ~/.vim/pack/smancill/start
     cd ~/.vim/pack/smancill/start
-    git clone https://github.com/smancill/vim-unimpaired-slim.git
+    git clone https://github.com/smancill/vim-unimpaired-lite.git
     vim -u NONE -c "helptags unimpaired/doc" -c q
 
 ## License
