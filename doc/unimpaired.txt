@@ -37,4 +37,18 @@ is "args" and for the "q" commands is "quickfix".
 *[T*     |:tfirst|
 *]T*     |:tlast|
 
+OPTION TOGGLING                                 *unimpaired-toggling*
+
+On	Off	Toggle	Option
+*[od*	*]od*	*yod*	'diff' (actually |:diffthis| / |:diffoff|)
+*[oh*	*]oh*	*yoh*	'hlsearch'
+*[oi*	*]oi*	*yoi*	'ignorecase'
+*[ol*	*]ol*	*yol*	'list'
+*[on*	*]on*	*yon*	'number'
+*[or*	*]or*	*yor*	'relativenumber'
+*[os*	*]os*	*yos*	'spell'
+*[ow*	*]ow*	*yow*	'wrap'
+
+The mnemonic for y is that if you tilt it a bit it looks like a switch.
+
  vim:tw=78:et:ft=help:norl:

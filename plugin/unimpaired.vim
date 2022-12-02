@@ -60,4 +60,40 @@ call s:MapNextFamily('l', 'l', 'll')
 call s:MapNextFamily('q', 'c', 'cc')
 call s:MapNextFamily('t', 't', 'trewind')
 
+" Section: Option toggling
+
+function! s:StatuslineRefresh() abort
+  let &l:readonly = &l:readonly
+  return ''
+endfunction
+
+function! s:Toggle(op) abort
+  call s:StatuslineRefresh()
+  return eval('&'.a:op) ? 'no'.a:op : a:op
+endfunction
+
+function! s:option_map(letter, option, mode) abort
+  exe 'nmap <script> <Plug>(unimpaired-enable)' .a:letter ':<C-U>'.a:mode.' '.a:option.'<C-R>=<SID>StatuslineRefresh()<CR><CR>'
+  exe 'nmap <script> <Plug>(unimpaired-disable)'.a:letter ':<C-U>'.a:mode.' no'.a:option.'<C-R>=<SID>StatuslineRefresh()<CR><CR>'
+  exe 'nmap <script> <Plug>(unimpaired-toggle)' .a:letter ':<C-U>'.a:mode.' <C-R>=<SID>Toggle("'.a:option.'")<CR><CR>'
+endfunction
+
+nmap <script> <Plug>(unimpaired-enable)d  :<C-U>diffthis<CR>
+nmap <script> <Plug>(unimpaired-disable)d :<C-U>diffoff<CR>
+nmap <script> <Plug>(unimpaired-toggle)d  :<C-U><C-R>=&diff ? "diffoff" : "diffthis"<CR><CR>
+call s:option_map('h', 'hlsearch', 'set')
+call s:option_map('i', 'ignorecase', 'set')
+call s:option_map('l', 'list', 'setlocal')
+call s:option_map('n', 'number', 'setlocal')
+call s:option_map('r', 'relativenumber', 'setlocal')
+call s:option_map('s', 'spell', 'setlocal')
+call s:option_map('w', 'wrap', 'setlocal')
+
+exe s:Map('n', get(g:, 'unimpaired_toggling_prefix', 'y') . 'o', '<Plug>(unimpaired-toggle)')
+exe s:Map('n', '[o', '<Plug>(unimpaired-enable)')
+exe s:Map('n', ']o', '<Plug>(unimpaired-disable)')
+exe s:Map('n', get(g:, 'unimpaired_toggling_prefix', 'y') . 'o<Esc>', '<Nop>')
+exe s:Map('n', '[o<Esc>', '<Nop>')
+exe s:Map('n', ']o<Esc>', '<Nop>')
+
 " vim:set sw=2 sts=2:
