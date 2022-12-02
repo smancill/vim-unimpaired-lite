@@ -8,9 +8,6 @@ commonly used ex commands. `]q` is :cnext. `[q` is :cprevious. `]a` is
 :next.  `[b` is :bprevious.  See the documentation for the full set of
 20 mappings and mnemonics.  All of them take a count.
 
-And in the miscellaneous category, there's `[n` and `]n` to jump between
-SCM conflict markers.
-
 The `.` command works with all operator mappings.
 
 ## Installation
