@@ -1,4 +1,4 @@
-*unimpaired.txt*  Pairs of handy bracket mappings (slim version)
+*unimpaired.txt*  Pairs of handy bracket mappings (lite version)
 
 Mantainer: Sebastián Mancilla
 Author:  Tim Pope <http://tpo.pe/>

@@ -1,4 +1,4 @@
-" unimpaired.vim - Pairs of handy bracket mappings (slim version)
+" unimpaired.vim - Pairs of handy bracket mappings (lite version)
 " Maintainer:   Sebastián Mancilla
 " Author:       Tim Pope <http://tpo.pe/>
 " Version:      2.1
